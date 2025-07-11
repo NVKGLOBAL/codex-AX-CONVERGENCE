@@ -1,7 +1,7 @@
 import React from 'react';
 import EchoScribePanel from './components/EchoScribePanel';
 
-function App() {
+export default function App() {
   return (
     <div>
       <h1>Codex Whisper Agent System Demo</h1>
@@ -9,5 +9,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
