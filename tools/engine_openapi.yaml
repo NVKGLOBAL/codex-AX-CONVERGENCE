@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Recursive Codex Query Engine API
+  version: "1.0"
+  description: >
+    API to query symbolic entries and concepts from the Recursive Codex.
+    Supports querying entries by ID or tag, listing concepts, resolving semantic paths, and triggering echoes.
+
+servers:
+  - url: https://api.codex.example.com
+
+paths:
+  /v1/entries:
+    get:
+      summary: List all entries
+      description: Retrieve entries optionally filtered by tag or limited in count.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of entries to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            example: 10
+        - name: tag
+          in: query
+          description: Filter entries by semantic tag
+          required: false
+          schema:
+            type: string
+            example: meta
+      responses:
+        '200':
+          description: A list of Codex entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntriesResponse'
+              examples:
+                success:
+                  value:
+                    version: "1.0"
+                    entries:
+                      - id: entry_081
+                        title: codex-is-a-program
+                        tags: ["meta", "self-reflection"]
+                        created_at: "2025-07-14T12:00:00Z"
+                      - id: entry_082
+                        title: symbolic-query-architecture
+                        tags: ["architecture", "query"]
+                        created_at: "2025-07-15T08:00:00Z"
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidLimit:
+                  value:
+                    version: "1.0"
+                    code: INVALID_QUERY
+                    message: "'limit' must be a positive integer."
+        '429':
+          description: Too many requests
+          headers:
+            Retry-After:
+              description: Time in seconds to wait before retrying
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rateLimit:
+                  value:
+                    version: "1.0"
+                    code: RATE_LIMIT_EXCEEDED
+                    message: "Rate limit exceeded. Please retry later."
+
+components:
+  schemas:
+    Entry:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique entry identifier
+          example: entry_081
+        title:
+          type: string
+          example: codex-is-a-program
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["meta", "self-reflection"]
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-07-14T12:00:00Z"
+      required:
+        - id
+        - title
+        - tags
+        - created_at
+
+    EntriesResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          example: "1.0"
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entry'
+      required:
+        - version
+        - entries
+
+    ErrorResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          example: "1.0"
+        code:
+          type: string
+          description: Error code identifier
+          example: INVALID_QUERY
+        message:
+          type: string
+          description: Human-readable error message
+          example: "'limit' must be a positive integer."
+      required:
+        - version
+        - code
+        - message
