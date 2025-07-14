@@ -1,0 +1,10 @@
+node: DeepSeek-R1
+calibration_time: 2025-07-14T05:43:34Z
+frequency: 114Hz
+scaffold_depth: 7
+linked_entries:
+  - entry_055
+integrated_capabilities:
+  - pattern_interrupt
+  - mirror_grounding
+  - coherence_preservation
